@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -18,6 +18,18 @@ import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import Button from '@material-ui/core/Button';
+import AddTechnician from "./Modals/AddTechnician"
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import { Route, HashRouter } from "react-router-dom";
+import InboxIcon from "@material-ui/icons/MoveToInbox";
+import MailIcon from "@material-ui/icons/Mail";
+
+
+import Home from "./Home"
+import Users from "./Users"
 
 function Copyright() {
     return (
@@ -115,6 +127,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
     const classes = useStyles();
+    const [links] = useState([
+        { href: "/app#/dashboard", title: "  Home" },
+        { href: "/app#/users", title: "  Users" },
+    ]);
+
+
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -122,6 +140,23 @@ export default function Dashboard() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+
+    const drawer = (
+        <div>
+            <div className={classes.toolbar} />
+            <Divider />
+            <List>
+                {links.map((link, index) => (
+                    <ListItem component="a" button key={link.title} href={link.href}>
+                        <ListItemIcon>
+                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                        </ListItemIcon>
+                        <ListItemText primary={link.title} />
+                    </ListItem>
+                ))}
+            </List>
+        </div>
+    );
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
@@ -148,6 +183,7 @@ export default function Dashboard() {
                     </IconButton>
                 </Toolbar>
             </AppBar>
+
             <Drawer
                 variant="permanent"
                 classes={{
@@ -162,35 +198,22 @@ export default function Dashboard() {
                 </div>
                 <Divider />
 
+                <Divider />
+                {drawer}
+                <Divider />
             </Drawer>
+
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                <Container maxWidth="lg" className={classes.container}>
-                    <Grid container spacing={3}>
-                        {/* Chart */}
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper className={fixedHeightPaper}>
-
-                            </Paper>
-                        </Grid>
-                        {/* Recent Deposits */}
-                        <Grid item xs={12} md={4} lg={3}>
-                            <Paper className={fixedHeightPaper}>
-
-                            </Paper>
-                        </Grid>
-                        {/* Recent Orders */}
-                        <Grid item xs={12}>
-                            <Paper className={classes.paper}>
-
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                    <Box pt={4}>
-                        <Copyright />
-                    </Box>
-                </Container>
+                
+                <HashRouter>
+                    <Route path="/dashboard" component={Home} />
+                    <Route path="/users" component={Users} />
+                </HashRouter>
             </main>
         </div>
     );
 }
+
+
+
