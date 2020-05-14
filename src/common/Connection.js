@@ -5,7 +5,8 @@ class Connection extends Security {
 
     getConfig = async () => {
         var connValue = "";
-        connValue = `https://ticketing-api-ceu.herokuapp.com/`
+        // connValue = `https://ticketing-api-ceu.herokuapp.com/`
+        connValue = `http://localhost:80/`
         return connValue;
     }
 

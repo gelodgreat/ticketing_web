@@ -26,10 +26,12 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { Route, HashRouter } from "react-router-dom";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
-
-
 import Home from "./Home"
 import Users from "./Users"
+
+import Connection from "../common/Connection";
+const connection = new Connection()
+
 
 function Copyright() {
     return (
@@ -133,6 +135,7 @@ export default function Dashboard() {
     ]);
 
 
+
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -141,18 +144,24 @@ export default function Dashboard() {
         setOpen(false);
     };
 
+    const logout = async () => {
+        window.location.href = "/"
+    }
+
     const drawer = (
         <div>
             <div className={classes.toolbar} />
             <Divider />
             <List>
                 {links.map((link, index) => (
-                    <ListItem component="a" button key={link.title} href={link.href}>
-                        <ListItemIcon>
-                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={link.title} />
-                    </ListItem>
+                    <>
+                        <ListItem component="a" button key={link.title} href={link.href} >
+                            <ListItemIcon>
+                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            </ListItemIcon>
+                            <ListItemText primary={link.title} />
+                        </ListItem>
+                    </>
                 ))}
             </List>
         </div>
@@ -178,7 +187,9 @@ export default function Dashboard() {
           </Typography>
                     <IconButton color="inherit">
                         <Badge badgeContent={4} color="secondary">
-                            <NotificationsIcon />
+                            <Button variant="contained" color="primary" onClick={logout}>
+                                Logout
+                            </Button>
                         </Badge>
                     </IconButton>
                 </Toolbar>
@@ -205,7 +216,7 @@ export default function Dashboard() {
 
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                
+
                 <HashRouter>
                     <Route path="/dashboard" component={Home} />
                     <Route path="/users" component={Users} />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import clsx from 'clsx';
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -10,6 +11,9 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { green } from '@material-ui/core/colors';
+
 import Connection from "../common/Connection";
 const connection = new Connection()
 
@@ -55,7 +59,21 @@ const useStyles = makeStyles(theme => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2)
-    }
+    },
+    buttonProgress: {
+        color: green[500],
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginTop: -12,
+        marginLeft: -12,
+    },
+    buttonSuccess: {
+        backgroundColor: green[500],
+        '&:hover': {
+            backgroundColor: green[700],
+        },
+    },
 }));
 
 export default function SignInSide() {
@@ -63,7 +81,11 @@ export default function SignInSide() {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
+    const [loading, setLoading] = React.useState(false);
+    const [success, setSuccess] = React.useState(false);
+    const buttonClassname = clsx({
+        [classes.buttonSuccess]: success,
+    });
     useEffect(() => {
         initialLoad();
     });
@@ -82,7 +104,8 @@ export default function SignInSide() {
         localStorage.clear();
         event.preventDefault();
         try {
-
+            setSuccess(false);
+            setLoading(true);
 
             connection.post('login', { username, password }).then(response => {
                 console.log(response.data)
@@ -90,6 +113,8 @@ export default function SignInSide() {
                     var responseValue = Object.keys(response.data['user_access']);
                     if (responseValue.includes('token')) {
                         localStorage.setItem("data_access", JSON.stringify(response.data['user_access']));
+                        setSuccess(true);
+                        setLoading(false);
                         window.location.href = "/app#/dashboard";
                     } else {
 
@@ -97,10 +122,14 @@ export default function SignInSide() {
 
                 }
             }).catch(error => {
+                setSuccess(true);
+                setLoading(false);
                 console.log(error)
             })
 
         } catch (error) {
+            setSuccess(true);
+            setLoading(false);
             console.log(error);
         }
     }
@@ -142,21 +171,26 @@ export default function SignInSide() {
                             autoComplete="current-password"
                             onChange={e => setPassword(e.target.value)}
                         />
+
+
+
+                        {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
                         <Button
-                            type="submit"
-                            fullWidth
                             variant="contained"
                             color="primary"
-                            className={classes.submit}
+                            className={buttonClassname}
+                            disabled={loading}
+                            type="submit"
                         >
                             Sign In
-            </Button>
+        </Button>
+
                         <Box mt={5}>
                             <Copyright />
                         </Box>
                     </form>
                 </div>
             </Grid>
-        </Grid>
+        </Grid >
     );
 }

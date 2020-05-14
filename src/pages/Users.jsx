@@ -49,13 +49,7 @@ export default function Users() {
     const classes = useStyles();
     const [state, setState] = useState({
         columns: [
-            { title: "Ticker Id", field: "_id" },
-            { title: "Message", field: "message", },
-            {
-                title: "Status",
-                field: "status",
-                lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" }
-            },
+            { title: "Name", field: "name" },
         ],
         data: []
     });
@@ -91,7 +85,7 @@ export default function Users() {
                     </Button>
 
                         <MaterialTable
-                            title="Tickets"
+                            title="Technicians"
                             columns={state.columns}
                             data={state.data}
                             options={{
