@@ -15,9 +15,9 @@ export default class AddTechnician extends Component {
 
     handleSubmit = async () => {
         const data = {
-            name:this.state.name
+            name: this.state.name
         }
-        this.props.addNewTechnician(data)
+        this.props.processTrades(data, "add")
     }
 
     handleChange = (e) => {
@@ -30,7 +30,7 @@ export default class AddTechnician extends Component {
         return (
             <div>
                 <Dialog open={open} onClose={handleCloseTechModal} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">The Technician</DialogTitle>
+                    <DialogTitle id="form-dialog-title">New Technician</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
                             <span> Add new Expert Technician</span>

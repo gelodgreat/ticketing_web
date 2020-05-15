@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -27,7 +27,9 @@ import { Route, HashRouter } from "react-router-dom";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
 import Home from "./Home"
-import Users from "./Users"
+import Admin from "./Admin"
+import Technicians from "./Technicians"
+import Tickets from "./Tickets"
 
 import Connection from "../common/Connection";
 const connection = new Connection()
@@ -129,12 +131,39 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
     const classes = useStyles();
-    const [links] = useState([
-        { href: "/app#/dashboard", title: "  Home" },
-        { href: "/app#/users", title: "  Users" },
+    const [loaded, setLoaded] = useState(false)
+    const [links,] = useState([
+        { href: "/app#/dashboard", title: "Home" },
     ]);
 
+    useEffect(() => {
+        async function getUserType() {
+            try {
 
+                const user = localStorage.getItem('user')
+                const parsedUser = JSON.parse(user)
+                if (!links.includes({ title: "Admin" }) && parsedUser.userType === "SuperAdmin" && !loaded) {
+                    links.push(
+                        { href: "/app#/admin", title: "Admin" },
+                        { href: "/app#/technicians", title: "Technicians" },
+                    )
+                }
+                if (parsedUser.userType === "SuperAdmin" || parsedUser.userType === "Admin") {
+                    if (!loaded) {
+                        links.push(
+
+                            { href: "/app#/tickets", title: "Tickets" }
+                        )
+                    }
+                }
+
+                setLoaded(true)
+            } catch (error) {
+                window.location.href = "/"
+            }
+        }
+        getUserType()
+    })
 
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
@@ -170,58 +199,62 @@ export default function Dashboard() {
 
     return (
         <div className={classes.root}>
-            <CssBaseline />
-            <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-                <Toolbar className={classes.toolbar}>
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                        Dashboard
-          </Typography>
-                    <IconButton color="inherit">
-                        <Badge badgeContent={4} color="secondary">
-                            <Button variant="contained" color="primary" onClick={logout}>
-                                Logout
+            {loaded ?
+                <>
+                    <CssBaseline />
+                    <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+                        <Toolbar className={classes.toolbar}>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="open drawer"
+                                onClick={handleDrawerOpen}
+                                className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+                                Ticketing System
+                            </Typography>
+                            <IconButton color="inherit">
+                                <Button variant="contained" color="primary" onClick={logout}>
+                                    Logout
                             </Button>
-                        </Badge>
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
+                            </IconButton>
+                        </Toolbar>
+                    </AppBar>
 
-            <Drawer
-                variant="permanent"
-                classes={{
-                    paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-                }}
-                open={open}
-            >
-                <div className={classes.toolbarIcon}>
-                    <IconButton onClick={handleDrawerClose}>
-                        <ChevronLeftIcon />
-                    </IconButton>
-                </div>
-                <Divider />
+                    <Drawer
+                        variant="permanent"
+                        classes={{
+                            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+                        }}
+                        open={open}
+                    >
+                        <div className={classes.toolbarIcon}>
+                            <IconButton onClick={handleDrawerClose}>
+                                <ChevronLeftIcon />
+                            </IconButton>
+                        </div>
+                        <Divider />
 
-                <Divider />
-                {drawer}
-                <Divider />
-            </Drawer>
+                        <Divider />
+                        {drawer}
+                        <Divider />
+                    </Drawer>
 
-            <main className={classes.content}>
-                <div className={classes.appBarSpacer} />
+                    <main className={classes.content}>
+                        <div className={classes.appBarSpacer} />
 
-                <HashRouter>
-                    <Route path="/dashboard" component={Home} />
-                    <Route path="/users" component={Users} />
-                </HashRouter>
-            </main>
+                        <HashRouter>
+                            <Route path="/dashboard" component={Home} />
+                            <Route path="/technicians" component={Technicians} />
+                            <Route path="/admin" component={Admin} />
+                            <Route path="/tickets" component={Tickets} />
+                        </HashRouter>
+                    </main>
+                </>
+                : null}
         </div>
     );
 }

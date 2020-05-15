@@ -10,11 +10,19 @@ import Paper from '@material-ui/core/Paper';
 import Swal from "sweetalert2";
 import Connection from "../common/Connection";
 import CustomError from "../common/CustomError";
-import AddTicket from './Modals/AddTickets';
-
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+import PropTypes from 'prop-types';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import UpdateTechnician from "./Modals/UpdateTechnician"
 const customError = new CustomError();
 const connection = new Connection();
-
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -50,54 +58,47 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Home() {
+export default function PendingTickets() {
     const classes = useStyles();
-    const [technician, setTechnicians] = useState({})
-    const [state, setState] = useState({
-        data: [],
 
-    });
-    const [tech, setTech] = useState([])
-    const [modal, setModal] = useState(false);
+    const [tickets, setTickets] = useState([])
+    const [technician, setTechnicians] = useState({})
+    const [parsedTechnicians, setParsedTechnicians] = useState([])
+    const [updateTechnician, setUpdateTechnician] = useState("")
+    const [openTechnicianModal, setTechnicianModal] = useState(false);
     const handleClickOpenTechModal = () => {
-        setModal(true);
+        setTechnicianModal(true);
     };
     const handleCloseTechModal = () => {
-        setModal(false);
+        setTechnicianModal(false);
     };
+
+    async function getTickets() {
+        try {
+            var tickets = await connection.get('tickets');
+            console.log(tickets)
+            setTickets(tickets.data)
+            return tickets.data
+        } catch (error) {
+            var errorMessage = customError.getError(error);
+        }
+    }
 
     async function getTechnicians() {
         try {
             var technicians = await connection.get('technician');
-            setTech(technicians.data)
+            setTechnicians(technicians.data)
             var obj = technicians.data.reduce(function (acc, cur, i) {
                 acc[cur._id] = cur.name;
                 return acc;
             }, {});
-
+            setParsedTechnicians(obj)
             return obj
 
         } catch (error) {
             var errorMessage = customError.getError(error);
         }
     }
-    async function getTickets() {
-        try {
-            var tickets = await connection.get('tickets?verified=verified');
-            return tickets.data
-        } catch (error) {
-            var errorMessage = customError.getError(error);
-        }
-    }
-    useEffect(() => {
-        async function load() {
-            setTechnicians(await getTechnicians());
-            setState({ data: await getTickets() });
-        }
-        load()
-    }, []);
-
-
 
     const sweetAlertContent = (title, type, message) => {
         Swal.fire({
@@ -111,21 +112,15 @@ export default function Home() {
 
     async function processTrades(data, status, oldData) {
         try {
-            if (status === "add") {
-                var keyData = await connection.post('tickets', data)
-                setState({ data: await getTickets() });
-                handleCloseTechModal()
-                sweetAlertContent("Success", "success", `Success Processing Ticket, Please wait while the admin verifies your request`);
-            }
             if (status === "update") {
                 var keyData = await connection.put(`tickets/${oldData['_id']}`, data)
-                sweetAlertContent("Success", "success", `Success Processing Data`);
+                await getTickets()
             }
             if (status === "delete") {
                 var keyData = await connection.delete(`tickets/${oldData['_id']}`, data)
-                sweetAlertContent("Success", "success", `Success Processing Data`);
+                await getTickets()
             }
-
+            sweetAlertContent("Success", "success", `Success Processing Data`);
             return data;
         } catch (error) {
             console.log(error);
@@ -133,81 +128,77 @@ export default function Home() {
         }
     }
 
+    useEffect(() => {
+        async function load() {
+
+            await getTechnicians()
+            await getTickets()
+        }
+        load()
+    }, []);
+
+    function handleChange(e) {
+        this.setState({ [e.target.name]: e.target.value });
+    }
 
     return (
         <div className={classes.root}>
             <CssBaseline />
             <main className={classes.content}>
-                {modal ? <AddTicket
-                    open={modal}
-                    technician={tech}
-                    handleCloseTechModal={handleCloseTechModal}
-                    addTicket={processTrades}
-                /> : null}
-
                 <div className={classes.appBarSpacer} />
                 <Container maxWidth="xl" className={classes.container}>
-                    <Button style={{marginBottom:10}} variant="outlined" color="primary" onClick={handleClickOpenTechModal}>
-                        Add Ticket
-                    </Button>
-                    <Paper >
+                    <Paper>
                         <MaterialTable
                             title="Tickets"
                             columns={[
-                                { title: "Requestor", field: "requestorName", editable: 'never',},
+                                { title: "Requestor", field: "requestorName", },
                                 { title: "Message", field: "message", },
                                 {
                                     title: "Status",
                                     field: "status",
-                                    editable: 'never',
                                     lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" }
                                 },
-                                { title: "Solution", field: "solution", editable: 'never', },
+                                { title: "Technician", field: "technician._id", lookup: parsedTechnicians },
+                                { title: "Solution", field: "solution", },
+                                { title: "Verified", field: "verified", lookup: { verified: "verified", unverified: "unverified" } },
                             ]}
-                            data={state.data}
+                            data={tickets}
                             options={{
                                 grouping: true,
                                 searchFieldAlignment: "right",
                                 sorting: true
                             }}
                             editable={{
-                                // onRowAdd: newData =>
-                                // new Promise(async resolve => {
-                                //     const data = [...state.data];
-                                //     var dataNew = await processTrades(newData, "add");
-                                //     data.push(dataNew);
-                                //     resolve(setState({ ...state, data }));
-                                // }),
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise(async resolve => {
-                                        const data = [...state.data];
+                                        const data = tickets;
                                         var dataNew = await processTrades(newData, "update", oldData);
                                         data[data.indexOf(oldData)] = dataNew;
-                                        resolve(setState({ ...state, data }));
+                                        resolve(setTickets(data));
                                     }),
                                 onRowDelete: oldData =>
                                     new Promise(async resolve => {
-                                        const data = [...state.data];
+                                        const data = tickets;
                                         data.splice(data.indexOf(oldData), 1);
                                         await processTrades(oldData, "delete", oldData);
-                                        resolve(setState({ ...state, data }));
+                                        resolve(setTickets(data));
                                     })
                             }}
                             detailPanel={(rowData) => {
-                                console.log(rowData)
                                 return (
                                     <>
                                         <Container maxWidth="md" className={classes.container}>
-                                            <p>Technician: {rowData.technician.name}</p>
                                             <p>Created By: {rowData.createdBy.name}</p>
                                         </Container>
                                     </>
                                 )
                             }}
-                        />
 
+                        />
                     </Paper>
+
                 </Container>
+
             </main>
         </div>
     );

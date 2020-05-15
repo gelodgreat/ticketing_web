@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -7,10 +7,12 @@ import Button from '@material-ui/core/Button';
 import AddTechnician from './Modals/AddTechnician';
 import MaterialTable from "material-table";
 import Paper from '@material-ui/core/Paper';
-
+import CustomError from "../common/CustomError";
 import Connection from "../common/Connection";
-const connection = new Connection();
 
+import Swal from "sweetalert2";
+const connection = new Connection();
+const customError = new CustomError();
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -45,24 +47,68 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Users() {
+export default function Technicians() {
+    const sweetAlertContent = (title, type, message) => {
+        Swal.fire({
+            title: title,
+            type: type,
+            text: message,
+            showConfirmButton: false,
+            timer: 1000
+        });
+    };
+
     const classes = useStyles();
     const [state, setState] = useState({
-        columns: [
-            { title: "Name", field: "name" },
-        ],
         data: []
     });
-    const [openTechnicianModal, setTechnicianModal] = React.useState(false);
+    const [tech, setTech] = useState([])
+    const [openTechnicianModal, setTechnicianModal] = useState(false);
     const handleClickOpenTechModal = () => {
         setTechnicianModal(true);
     };
     const handleCloseTechModal = () => {
         setTechnicianModal(false);
     };
-    const addNewTechnician = async (data) => {
-        var technicians = await connection.post('technician', data)
-        console.log(technicians)
+    async function getTechnicians() {
+        try {
+            var technicians = await connection.get('technician');
+            console.log(technicians.data)
+            setTech({ data: technicians.data })
+            return technicians.data
+        } catch (error) {
+            var errorMessage = customError.getError(error);
+        }
+    }
+    useEffect(() => {
+        async function load() {
+            setState({ data: await getTechnicians() });
+        }
+        load()
+    }, []);
+
+
+    async function processTrades(data, status, oldData) {
+
+        try {
+            if (status === "add") {
+                var keyData = await connection.post('technician', data);
+                setState({ data: await getTechnicians() });
+                handleCloseTechModal()
+            }
+            if (status === "update") {
+                console.log(data)
+                var keyData = await connection.put(`technician/${oldData['_id']}`, data)
+            }
+            if (status === "delete") {
+                var keyData = await connection.delete(`technician/${oldData['_id']}`, data)
+            }
+            sweetAlertContent("Success", "success", `Success Processing Data`);
+            return data;
+        } catch (error) {
+            console.log(error);
+            sweetAlertContent("Error", "error", error);
+        }
     }
 
     return (
@@ -70,23 +116,25 @@ export default function Users() {
             <CssBaseline />
             <main className={classes.content}>
 
-
-                <AddTechnician
+                {openTechnicianModal ? <AddTechnician
                     open={openTechnicianModal}
                     handleCloseTechModal={handleCloseTechModal}
-                    addNewTechnician={addNewTechnician}
-                />
+                    processTrades={processTrades}
+                /> : null}
+
 
                 <div className={classes.appBarSpacer} />
                 <Container maxWidth="xl" className={classes.container}>
                     <Paper >
-                        <Button variant="outlined" color="primary" onClick={handleClickOpenTechModal}>
+                        <Button style={{ marginBottom: 10 }} variant="outlined" color="primary" onClick={handleClickOpenTechModal}>
                             Add Technician
                     </Button>
 
                         <MaterialTable
-                            title="Technicians"
-                            columns={state.columns}
+                            title="Users"
+                            columns={[
+                                { title: "Name", field: "name" },
+                            ]}
                             data={state.data}
                             options={{
                                 grouping: true,
@@ -94,25 +142,18 @@ export default function Users() {
                                 sorting: true
                             }}
                             editable={{
-                                onRowAdd: newData =>
-                                    new Promise(async resolve => {
-                                        const data = [...state.data];
-                                        // var dataNew = await processTrades(newData, "add");
-                                        // data.push(dataNew);
-                                        resolve(setState({ ...state, data }));
-                                    }),
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise(async resolve => {
                                         const data = [...state.data];
-                                        // var dataNew = await processTrades(newData, "update");
-                                        // data[data.indexOf(oldData)] = dataNew;
+                                        var dataNew = await processTrades(newData, "update", oldData);
+                                        data[data.indexOf(oldData)] = dataNew;
                                         resolve(setState({ ...state, data }));
                                     }),
                                 onRowDelete: oldData =>
                                     new Promise(async resolve => {
                                         const data = [...state.data];
                                         data.splice(data.indexOf(oldData), 1);
-                                        // await processTrades(oldData, "delete");
+                                        await processTrades(oldData, "delete", oldData);
                                         resolve(setState({ ...state, data }));
                                     })
                             }}

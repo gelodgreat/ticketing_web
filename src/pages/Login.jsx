@@ -113,6 +113,7 @@ export default function SignInSide() {
                     var responseValue = Object.keys(response.data['user_access']);
                     if (responseValue.includes('token')) {
                         localStorage.setItem("data_access", JSON.stringify(response.data['user_access']));
+                        localStorage.setItem("user", JSON.stringify(response.data['user']));
                         setSuccess(true);
                         setLoading(false);
                         window.location.href = "/app#/dashboard";

@@ -12,7 +12,7 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 
-export default class AddUser extends Component {
+export default class AddTicket extends Component {
     constructor(propss) {
         super(propss)
         this.state = {}
@@ -20,14 +20,13 @@ export default class AddUser extends Component {
 
     handleSubmit = async (e) => {
         e.preventDefault()
-        const { username, password, userType, name } = this.state
+        const { message, requestorName } = this.state
         const data = {
-            name: name,
-            username: username,
-            password: password,
-            userType: userType,
+            requestorName: requestorName,
+            message: message,
         }
-        await this.props.addNewUser(data, "add")
+        console.log(data)
+        await this.props.addTicket(data, "add")
     }
 
     handleChange = (e) => {
@@ -40,55 +39,31 @@ export default class AddUser extends Component {
         return (
             <div>
                 <Dialog open={open} onClose={handleCloseTechModal} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
-                    <DialogTitle id="form-dialog-title">New User</DialogTitle>
+                    <DialogTitle id="form-dialog-title">New Ticket</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            <span> Add new user</span>
+                            <span> Add new ticket</span>
                         </DialogContentText>
                         <TextField
                             autoFocus
                             margin="dense"
-                            id="name"
-                            label="name"
-                            name="name"
+                            id="requestorName"
+                            label="requestorName"
+                            name="requestorName"
                             fullWidth
                             onChange={this.handleChange}
                         />
                         <TextField
                             autoFocus
                             margin="dense"
-                            id="username"
-                            label="username"
-                            name="username"
+                            id="message"
+                            label="message"
+                            name="message"
                             fullWidth
-                            onChange={this.handleChange}
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="password"
-                            label="password"
-                            name="password"
-                            fullWidth
-                            type="password"
                             onChange={this.handleChange}
                         />
                         <br />
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Account Type</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={this.state.userType}
-                                name="userType"
-                                onChange={this.handleChange}
-                            >
-                                <MenuItem value="SuperAdmin">SuperAdmin</MenuItem>
-                                <MenuItem value="Admin">Admin</MenuItem>
-                                <MenuItem value="Guest">Guest</MenuItem>
 
-                            </Select>
-                        </FormControl>
 
                     </DialogContent>
                     <DialogActions>

@@ -12,10 +12,15 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 
-export default class AddUser extends Component {
+export default class UpdateTechnician extends Component {
     constructor(propss) {
         super(propss)
-        this.state = {}
+        this.state = {
+            currentTechnician: this.props.rowData.technician._id
+        }
+    }
+    componentDidMount() {
+
     }
 
     handleSubmit = async (e) => {
@@ -35,57 +40,31 @@ export default class AddUser extends Component {
     }
 
     render() {
-        const open = this.props.open;
-        const handleCloseTechModal = this.props.handleCloseTechModal
+        const { handleCloseTechModal, open, technician } = this.props;
+        console.log(this.props)
+        const { currentTechnician } = this.state
         return (
             <div>
                 <Dialog open={open} onClose={handleCloseTechModal} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
-                    <DialogTitle id="form-dialog-title">New User</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Update Technician</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            <span> Add new user</span>
+                            <span>Update Technician</span>
                         </DialogContentText>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="name"
-                            label="name"
-                            name="name"
-                            fullWidth
-                            onChange={this.handleChange}
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="username"
-                            label="username"
-                            name="username"
-                            fullWidth
-                            onChange={this.handleChange}
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="password"
-                            label="password"
-                            name="password"
-                            fullWidth
-                            type="password"
-                            onChange={this.handleChange}
-                        />
+
                         <br />
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Account Type</InputLabel>
+                        <FormControl maxWidth="md" fullWidth>
+                            <InputLabel id="demo-simple-select-label">Technician</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={this.state.userType}
-                                name="userType"
+                                value={currentTechnician}
+                                name="technician"
                                 onChange={this.handleChange}
                             >
-                                <MenuItem value="SuperAdmin">SuperAdmin</MenuItem>
-                                <MenuItem value="Admin">Admin</MenuItem>
-                                <MenuItem value="Guest">Guest</MenuItem>
+                                {/* {technician.map(technician => {
+                                    return <MenuItem value={technician._id}>{technician.name}</MenuItem>
+                                })} */}
 
                             </Select>
                         </FormControl>
