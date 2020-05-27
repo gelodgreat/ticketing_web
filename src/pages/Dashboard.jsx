@@ -132,7 +132,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
     const classes = useStyles();
     const [loaded, setLoaded] = useState(false)
-    const [links,] = useState([
+    const [links, setLinks] = useState([
         { href: "/app#/dashboard", title: "Home" },
     ]);
 
@@ -148,12 +148,12 @@ export default function Dashboard() {
                         { href: "/app#/technicians", title: "Technicians" },
                     )
                 }
-                if (parsedUser.userType === "SuperAdmin" || parsedUser.userType === "Admin") {
+                if (parsedUser.userType === "SuperAdmin" || parsedUser.userType === "Admin" && !loaded) {
                     if (!loaded) {
                         links.push(
-
                             { href: "/app#/tickets", title: "Tickets" }
                         )
+                        setLinks(links.filter(i => i.title !== "Home"))
                     }
                 }
 

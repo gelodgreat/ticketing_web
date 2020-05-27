@@ -168,7 +168,6 @@ export default function Home() {
                                 {
                                     title: "Status",
                                     field: "status",
-                                    editable: 'never',
                                     lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" }
                                 },
                                 { title: "Solution", field: "solution", editable: 'never', },

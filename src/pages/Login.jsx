@@ -116,7 +116,13 @@ export default function SignInSide() {
                         localStorage.setItem("user", JSON.stringify(response.data['user']));
                         setSuccess(true);
                         setLoading(false);
-                        window.location.href = "/app#/dashboard";
+                        const parsedUserType = response.data['user']['userType'];
+                        if (parsedUserType === "Guest") {
+                            window.location.href = "/app#/dashboard";
+                        } else if (parsedUserType === "Admin" || parsedUserType === "SuperAdmin") {
+                            window.location.href = "/app#/tickets";
+                        }
+
                     } else {
 
                     }

@@ -69,6 +69,8 @@ export default function PendingTickets() {
     const handleClickOpenTechModal = () => {
         setTechnicianModal(true);
     };
+    const [parsedUser, setParsedUser] = useState({})
+
     const handleCloseTechModal = () => {
         setTechnicianModal(false);
     };
@@ -133,6 +135,9 @@ export default function PendingTickets() {
 
             await getTechnicians()
             await getTickets()
+            const user = await localStorage.getItem('user')
+            const parsedUser = JSON.parse(user);
+            setParsedUser(parsedUser)
         }
         load()
     }, []);
@@ -150,17 +155,22 @@ export default function PendingTickets() {
                     <Paper>
                         <MaterialTable
                             title="Tickets"
+
                             columns={[
-                                { title: "Requestor", field: "requestorName", },
-                                { title: "Message", field: "message", },
+                                { title: "Ticket No.", field: "_id", editable: false },
+                                { title: "Requestor", field: "requestorName", editable: false },
+                                { title: "Message", field: "message", editable: false },
                                 {
                                     title: "Status",
                                     field: "status",
+                                    editable: parsedUser['userType'] === "Admin" ? true : false,
                                     lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" }
                                 },
                                 { title: "Technician", field: "technician._id", lookup: parsedTechnicians },
                                 { title: "Solution", field: "solution", },
                                 { title: "Verified", field: "verified", lookup: { verified: "verified", unverified: "unverified" } },
+                                { title: "Created At", field: "createdAt", editable: false },
+                                { title: "Username", field: "createdBy.username", editable: false }
                             ]}
                             data={tickets}
                             options={{
@@ -168,6 +178,22 @@ export default function PendingTickets() {
                                 searchFieldAlignment: "right",
                                 sorting: true
                             }}
+                            actions={[
+                                {
+                                    icon: 'delete',
+                                    tooltip: 'Delete',
+                                    onClick: (event, oldData) => {
+                                        new Promise(async resolve => {
+                                            const data = tickets;
+                                            data.splice(data.indexOf(oldData), 1);
+                                            await processTrades(oldData, "delete", oldData);
+                                            resolve(setTickets(data));
+                                        })
+                                    },
+                                    disabled: parsedUser.userType === "Admin" ? true : false
+
+                                }
+                            ]}
                             editable={{
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise(async resolve => {
@@ -176,13 +202,6 @@ export default function PendingTickets() {
                                         data[data.indexOf(oldData)] = dataNew;
                                         resolve(setTickets(data));
                                     }),
-                                onRowDelete: oldData =>
-                                    new Promise(async resolve => {
-                                        const data = tickets;
-                                        data.splice(data.indexOf(oldData), 1);
-                                        await processTrades(oldData, "delete", oldData);
-                                        resolve(setTickets(data));
-                                    })
                             }}
                             detailPanel={(rowData) => {
                                 return (
