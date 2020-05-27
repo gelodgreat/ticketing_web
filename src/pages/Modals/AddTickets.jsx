@@ -41,14 +41,11 @@ export default class AddTicket extends Component {
                 <Dialog open={open} onClose={handleCloseTechModal} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
                     <DialogTitle id="form-dialog-title">New Ticket</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>
-                            <span> Add new ticket</span>
-                        </DialogContentText>
                         <TextField
                             autoFocus
                             margin="dense"
                             id="requestorName"
-                            label="requestorName"
+                            label="Name"
                             name="requestorName"
                             fullWidth
                             onChange={this.handleChange}
@@ -57,7 +54,7 @@ export default class AddTicket extends Component {
                             autoFocus
                             margin="dense"
                             id="message"
-                            label="message"
+                            label="Concern"
                             name="message"
                             fullWidth
                             onChange={this.handleChange}

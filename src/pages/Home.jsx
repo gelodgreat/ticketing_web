@@ -83,7 +83,16 @@ export default function Home() {
     }
     async function getTickets() {
         try {
-            var tickets = await connection.get('tickets?verified=verified');
+            const user = await localStorage.getItem('user')
+            const parsedUser = JSON.parse(user)
+            console.log(parsedUser)
+            var tickets;
+            if (parsedUser['userType'] === "Guest") {
+                tickets = await connection.get(`tickets?verified=verified&createdBy=${parsedUser['_id']}`);
+            } else {
+                tickets = await connection.get('tickets?verified=verified');
+            }
+
             return tickets.data
         } catch (error) {
             var errorMessage = customError.getError(error);
@@ -147,15 +156,15 @@ export default function Home() {
 
                 <div className={classes.appBarSpacer} />
                 <Container maxWidth="xl" className={classes.container}>
-                    <Button style={{marginBottom:10}} variant="outlined" color="primary" onClick={handleClickOpenTechModal}>
+                    <Button style={{ marginBottom: 10 }} variant="outlined" color="primary" onClick={handleClickOpenTechModal}>
                         Add Ticket
                     </Button>
                     <Paper >
                         <MaterialTable
                             title="Tickets"
                             columns={[
-                                { title: "Requestor", field: "requestorName", editable: 'never',},
-                                { title: "Message", field: "message", },
+                                { title: "Name", field: "requestorName", editable: 'never', },
+                                { title: "Concern", field: "message", },
                                 {
                                     title: "Status",
                                     field: "status",
@@ -178,6 +187,8 @@ export default function Home() {
                                 //     data.push(dataNew);
                                 //     resolve(setState({ ...state, data }));
                                 // }),
+                                isEditable: rowData => !rowData.solution,
+                                isDeletable: rowData => !rowData.solution,
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise(async resolve => {
                                         const data = [...state.data];

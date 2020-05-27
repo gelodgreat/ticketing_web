@@ -157,7 +157,7 @@ export default function Technicians() {
                             columns={[
                                 { title: "Name", field: "name" },
                                 { title: "Username", field: "username" },
-                                { title: "Account Type", field: "userType", lookup: { Admin: "Admin", SuperAdmin: "SuperAdmin" } },
+                                { title: "Account Type", field: "userType", lookup: { Admin: "Admin", SuperAdmin: "SuperAdmin", Guest: "Guest" } },
                             ]}
                             data={state.data}
                             options={{
@@ -210,7 +210,8 @@ export default function Technicians() {
                             options={{
                                 grouping: true,
                                 searchFieldAlignment: "right",
-                                sorting: true
+                                sorting: true,
+                                exportButton: true
                             }}
                             editable={{
                                 // onRowAdd: newData =>
