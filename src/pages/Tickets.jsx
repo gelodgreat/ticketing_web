@@ -21,6 +21,16 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import UpdateTechnician from "./Modals/UpdateTechnician"
+import { connect } from 'react-redux';
+import * as actions from "../redux/actions/technicians"
+
+const mapStateToProps = state => {
+    return {
+        technicians: state.technicians,
+    }
+}
+
+
 const customError = new CustomError();
 const connection = new Connection();
 
@@ -58,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function PendingTickets() {
+function PendingTickets(props) {
     const classes = useStyles();
 
     const [tickets, setTickets] = useState([])
@@ -78,7 +88,6 @@ export default function PendingTickets() {
     async function getTickets() {
         try {
             var tickets = await connection.get('tickets');
-            console.log(tickets)
             setTickets(tickets.data)
             return tickets.data
         } catch (error) {
@@ -132,7 +141,7 @@ export default function PendingTickets() {
 
     useEffect(() => {
         async function load() {
-
+            console.log("====>", props)
             await getTechnicians()
             await getTickets()
             const user = await localStorage.getItem('user')
@@ -212,13 +221,17 @@ export default function PendingTickets() {
                                     </>
                                 )
                             }}
-
                         />
-                    </Paper>
+                        {/* {props.technicians.map(item => {
+                            return item.title
+                        })} */}
 
+                    </Paper>
                 </Container>
 
             </main>
         </div>
     );
 }
+
+export default connect(mapStateToProps)(PendingTickets)

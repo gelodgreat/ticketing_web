@@ -3,16 +3,21 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard"
 
+import { Provider } from 'react-redux';
+import store from './redux/store';
+
 class App extends Component {
   render() {
     return (
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/app" component={Dashboard} />
-          <Route exact path="/app/*" component={Dashboard} />
-          <Route path="/" component={Login} />
-        </Switch>
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/app" component={Dashboard} />
+            <Route exact path="/app/*" component={Dashboard} />
+            <Route path="/" component={Login} />
+          </Switch>
+        </BrowserRouter>
+      </Provider>
     );
   }
 }

@@ -9,8 +9,27 @@ import MaterialTable from "material-table";
 import Paper from '@material-ui/core/Paper';
 import CustomError from "../common/CustomError";
 import Connection from "../common/Connection";
-
 import Swal from "sweetalert2";
+
+import { connect } from 'react-redux';
+import { fetchTechnicians } from '../redux/actions/technicians';
+import * as actions from "../redux/actions/technicians"
+
+const mapStateToProps = state => {
+    return {
+        technicians: state.technicians.technicians
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        fetchTechnicians: () => {
+            dispatch(actions.fetchTechnicians())
+        },
+    }
+}
+
+
 const connection = new Connection();
 const customError = new CustomError();
 const useStyles = makeStyles((theme) => ({
@@ -47,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Technicians() {
+function Technicians(props) {
     const sweetAlertContent = (title, type, message) => {
         Swal.fire({
             title: title,
@@ -73,7 +92,6 @@ export default function Technicians() {
     async function getTechnicians() {
         try {
             var technicians = await connection.get('technician');
-            console.log(technicians.data)
             setTech({ data: technicians.data })
             return technicians.data
         } catch (error) {
@@ -82,6 +100,7 @@ export default function Technicians() {
     }
     useEffect(() => {
         async function load() {
+            await props.fetchTechnicians()
             setState({ data: await getTechnicians() });
         }
         load()
@@ -165,3 +184,5 @@ export default function Technicians() {
         </div>
     );
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Technicians);
