@@ -17,7 +17,7 @@ import * as actions from "../redux/actions/technicians"
 
 const mapStateToProps = state => {
     return {
-        technicians: state.technicians.technicians
+        // technicians: state.technicians.technicians
     }
 }
 

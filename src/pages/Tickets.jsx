@@ -141,7 +141,7 @@ function PendingTickets(props) {
 
     useEffect(() => {
         async function load() {
-            console.log("====>", props)
+            console.log("====>", props.technicians)
             await getTechnicians()
             await getTickets()
             const user = await localStorage.getItem('user')
