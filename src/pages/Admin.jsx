@@ -64,6 +64,7 @@ export default function Technicians() {
         ticketsData: []
     });
     const [technician, setTechnicians] = useState({})
+    const [parsedTechnicians, setParsedTechnicians] = useState([])
     const [openUserModal, setUserModal] = useState(false);
     const handleClickOpenTechModal = () => {
         setUserModal(true);
@@ -87,7 +88,7 @@ export default function Technicians() {
                 acc[cur._id] = cur.name;
                 return acc;
             }, {});
-
+            setParsedTechnicians(obj)
             return obj
 
         } catch (error) {
@@ -196,15 +197,14 @@ export default function Technicians() {
                         <MaterialTable
                             title="Tickets"
                             columns={[
-                                { title: "Message", field: "message", },
-                                {
-                                    title: "Status",
-                                    field: "status",
-                                    editable: 'never',
-                                    lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" }
-                                },
-                                // { title: "Technician", field: "name", },
-                                { title: "Technician", field: "name", lookup: technician },
+                                { title: "Ticket No.", field: "_id", editable: false },
+                                { title: "Requestor", field: "requestorName", editable: false },
+                                { title: "Message", field: "message", editable: false },
+                                { title: "Technician", field: "technician._id", lookup: parsedTechnicians },
+                                { title: "Solution", field: "solution", },
+                                { title: "Verified", field: "verified", lookup: { verified: "verified", unverified: "unverified" } },
+                                { title: "Created At", field: "createdAt", editable: false },
+                                { title: "Username", field: "createdBy.username", editable: false }
                             ]}
                             data={state.ticketsData}
                             options={{

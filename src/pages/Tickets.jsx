@@ -164,7 +164,6 @@ function PendingTickets(props) {
                     <Paper>
                         <MaterialTable
                             title="Tickets"
-
                             columns={[
                                 { title: "Ticket No.", field: "_id", editable: false },
                                 { title: "Requestor", field: "requestorName", editable: false },

@@ -88,9 +88,9 @@ export default function Home() {
             console.log(parsedUser)
             var tickets;
             if (parsedUser['userType'] === "Guest") {
-                tickets = await connection.get(`tickets?verified=verified&createdBy=${parsedUser['_id']}`);
+                tickets = await connection.get(`tickets?createdBy=${parsedUser['_id']}`);
             } else {
-                tickets = await connection.get('tickets?verified=verified');
+                tickets = await connection.get('tickets');
             }
 
             return tickets.data
@@ -168,7 +168,8 @@ export default function Home() {
                                 {
                                     title: "Status",
                                     field: "status",
-                                    lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" }
+                                    lookup: { Pending: "Pending", Ongoing: "Ongoing", Fixed: "Fixed" },
+                                    editable: 'never',
                                 },
                                 { title: "Solution", field: "solution", editable: 'never', },
                             ]}
@@ -208,8 +209,9 @@ export default function Home() {
                                 return (
                                     <>
                                         <Container maxWidth="md" className={classes.container}>
-                                            <p>Technician: {rowData.technician.name}</p>
-                                            <p>Created By: {rowData.createdBy.name}</p>
+                                            <p>{rowData.createdAt} Created By: {rowData.createdBy.name}</p>
+                                            {rowData.verifiedAt ? <p>{rowData.verifiedAt} Verify By: {rowData.verifiedBy.name}</p> : null}
+                                            {rowData.fixedAt ? <p>{rowData.fixedAt} Fixed By: {rowData.technician.name}</p> : null}
                                         </Container>
                                     </>
                                 )
