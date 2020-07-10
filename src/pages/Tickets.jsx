@@ -185,7 +185,7 @@ function PendingTickets(props) {
                             options={{
                                 grouping: true,
                                 searchFieldAlignment: "right",
-                                sorting: true
+                                sorting: true,
                             }}
                             actions={[
                                 {
@@ -216,7 +216,9 @@ function PendingTickets(props) {
                                 return (
                                     <>
                                         <Container maxWidth="md" className={classes.container}>
-                                            <p>Created By: {rowData.createdBy.name}</p>
+                                            <p>{rowData.createdAt} Created By: {rowData.createdBy.name}</p>
+                                            {rowData.verifiedAt ? <p>{rowData.verifiedAt} Verify By: {rowData.verifiedBy.name}</p> : null}
+                                            {rowData.fixedAt ? <p>{rowData.fixedAt} Fixed By: {rowData.technician.name}</p> : null}
                                         </Container>
                                     </>
                                 )
