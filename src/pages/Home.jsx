@@ -163,6 +163,7 @@ export default function Home() {
                         <MaterialTable
                             title="Tickets"
                             columns={[
+                                { title: "Ticket No.", field: "ticketNumber", editable: false },
                                 { title: "Name", field: "requestorName", editable: 'never', },
                                 { title: "Concern", field: "message", },
                                 {

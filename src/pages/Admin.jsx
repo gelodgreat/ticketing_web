@@ -197,7 +197,7 @@ export default function Technicians() {
                         <MaterialTable
                             title="Tickets"
                             columns={[
-                                { title: "Ticket No.", field: "_id", editable: false },
+                                { title: "Ticket No.", field: "ticketNumber", editable: false },
                                 { title: "Requestor", field: "requestorName", editable: false },
                                 { title: "Message", field: "message", editable: false },
                                 { title: "Technician", field: "technician._id", lookup: parsedTechnicians },
